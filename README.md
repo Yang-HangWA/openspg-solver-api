@@ -23,7 +23,7 @@ cd openspg-solver-api
 - Create Conda Environment
 
 ```shell
-create conda -n openspg-solver-api python=3.8
+conda create -n openspg-solver-api python=3.8
 conda activate openspg-solver-api
 ```
 
@@ -39,21 +39,60 @@ pip install -r requirements.txt
 python api.py --host=0.0.0.0 --port=8888 --openspg-service=http://127.0.0.1:8887
 ```
 
-## API Document
+## Command Line Options
 
-```shell
-http://127.0.0.1:8888/
+- `--host`: Host to bind the server (default: 127.0.0.1)
+- `--port`: Port to bind the server (default: 8888)
+- `--servlet`: Base path for API endpoints (default: /api)
+- `--desc`: API description (default: OpenSPG API Server)
+- `--openspg-service`: URL of the OpenSPG service (default: http://127.0.0.1:8887)
+- `--openspg-modules`: Additional modules to load (optional)
+
+## LLM Configuration
+
+Before using the chat completions API, you need to configure an LLM in your OpenSPG project:
+
+```yaml
+# Define LLM client
+generate_llm: &generate_llm
+  api_key: your_api_key_here
+  base_url: https://api.openai.com/v1
+  model: gpt-3.5-turbo
+  type: stream_openai_llm
+  temperature: 0.7
+
+# Configure solver pipeline
+solver_pipeline:
+  generator:
+    type: default_generator
+    llm_client: *generate_llm
 ```
 
-## Streaming Generator
+See [LLM Configuration Guide](./app/openspg/service/kag_additions/README.md) for more details.
 
-> See [kag_additions](./app/openspg/service/kag_additions/README.md)
+## API Documentation
 
-## Test
+API documentation is available at:
 
-### Models
+```
+http://your-server:port/api/docs
+```
 
-> Request
+## API Endpoints
+
+### Configuration Validation
+
+```shell
+curl -X 'POST' \
+  'http://127.0.0.1:8888/api/validate_config' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "project_name": "YourProjectName"
+}'
+```
+
+### Models List
 
 ```shell
 curl -X 'GET' \
@@ -61,7 +100,7 @@ curl -X 'GET' \
   -H 'accept: application/json'
 ```
 
-> Response
+Response:
 
 ```json
 {
@@ -83,9 +122,7 @@ curl -X 'GET' \
 }
 ```
 
-### Completions
-
-> Request
+### Chat Completions
 
 ```shell
 curl -X 'POST' \
@@ -103,3 +140,31 @@ curl -X 'POST' \
   ]
 }'
 ```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Connection reset during streaming**
+   - Increase the client timeout settings
+   - Make sure you're properly consuming the stream
+
+2. **JSON serialization errors**
+   - Check your project for non-serializable objects in responses
+
+3. **LLM configuration errors**
+   - Validate your configuration using the `/api/validate_config` endpoint
+   - Check the required fields for your chosen LLM type
+
+### Debug Logging
+
+Enable detailed logging by setting the environment variable:
+
+```shell
+export LOG_LEVEL=DEBUG
+```
+
+## Contributors
+
+- Original author: thundax-lyp
+- Contributors welcome!

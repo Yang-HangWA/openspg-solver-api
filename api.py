@@ -11,7 +11,7 @@ from app.fastapi_extends.responses import JSONResponse
 def parse_args():
     parser = argparse.ArgumentParser(prog='OpenSPG API Server', description='An OpenSPG Knowledge Base API Server')
     parser.add_argument('--host', type=str, default="127.0.0.1")
-    parser.add_argument('--port', type=int, default=8888)
+    parser.add_argument('--port', type=int, default=8889)
     parser.add_argument('--servlet', type=str, default='/api')
     parser.add_argument('--desc', type=str, default='OpenSPG API Server')
     parser.add_argument('--openspg-service', type=str, default='http://127.0.0.1:8887')
